@@ -4,7 +4,6 @@ import { requestFarcasterAttestation } from 'helpers/attestor'
 import { useLocation } from 'wouter'
 import BurnerWalletStore from 'stores/BurnerWalletStore'
 import Button from 'components/ui/Button'
-import getErrorMessage from 'helpers/getErrorMessage'
 import walletStore from 'stores/WalletStore'
 
 export default function ({
@@ -55,23 +54,8 @@ export default function ({
       walletStore.exit()
       setLocation('/wallet')
     } catch (error) {
-      let errorMessage = getErrorMessage(error)
-      if (
-        typeof errorMessage === 'string' &&
-        errorMessage.includes('user rejected signing')
-      ) {
-        errorMessage = 'Please sign the transaction to create a burner wallet'
-      }
-      onError(
-        typeof errorMessage === 'string'
-          ? errorMessage
-          : 'We could not match the username with the wallet you have connected. Please review them and try again.'
-      )
-      handleError(
-        typeof errorMessage === 'string'
-          ? new Error(errorMessage)
-          : errorMessage
-      )
+      const errorMessage = handleError(error)
+      onError(errorMessage)
     } finally {
       onLoading(false)
     }
